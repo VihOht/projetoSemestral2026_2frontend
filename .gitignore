@@ -1,0 +1,30 @@
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Dependências
+node_modules/
+
+# Arquivos de ambiente
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Build e cache
+dist/
+build/
+.cache/
+
+# Arquivos temporários
+*.tmp
+*.swp
+*~
+
+# Backups locais
+*.backup.js
+*.backup.css
+*.backup.html

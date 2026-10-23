@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080f1c">
+  <meta name="description" content="GameLibrary: biblioteca de jogos e trilhas sonoras.">
+
+  <title>gameLibrary | Sua biblioteca de jogos</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <header class="top">
+    <div class="top-inner">
+
+      <a class="logo" href="#/" aria-label="Ir para a biblioteca">
+        <span class="brand-symbol">🎮</span>
+        <span class="brand-text">
+          game<span>library</span>
+          <small>PROJETO DE SOFTWARE</small>
+        </span>
+      </a>
+
+      <nav aria-label="Navegação principal">
+        <a href="#/">Biblioteca</a>
+        <a href="#/trilhas">Trilhas sonoras</a>
+      </nav>
+
+      <div class="top-actions">
+        <button type="button" id="auth-login" class="btn btn-secondary" hidden>Entrar</button>
+        <button type="button" id="auth-logout" class="btn btn-secondary" hidden>Sair</button>
+
+        <button
+          type="button"
+          id="mode-toggle"
+          class="mode-toggle"
+          title="Alternar entre demonstração e backend"
+        >
+          Demonstração
+        </button>
+
+        <label class="search-wrap">
+          <span aria-hidden="true">⌕</span>
+          <input
+            id="q"
+            type="search"
+            placeholder="Buscar jogos..."
+            aria-label="Buscar jogos"
+          >
+        </label>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          data-act="novo"
+        >
+          <span>＋</span>
+          Adicionar jogo
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <main id="app" aria-live="polite"></main>
+
+  <footer class="site-footer">
+    <span>GAME LIBRARY / PROJETO DE SOFTWARE · 2026.2</span>
+    <span>Seu universo de jogos, organizado.</span>
+  </footer>
+
+  <dialog id="dlg" aria-label="Cadastro e edição de jogo"></dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
