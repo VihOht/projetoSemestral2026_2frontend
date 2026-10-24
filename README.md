@@ -72,7 +72,7 @@ As capas de demonstração são ilustrações abstratas. Quando disponíveis, as
 O frontend ativo é HTML/JavaScript, servido por `index.html`; não é necessário instalar React. `auth.js` usa o SDK oficial Auth0 SPA e os valores públicos encontrados em `main.jsx`:
 
 - Domain: `dev-bpbgrel3zl2chj7s.us.auth0.com`
-- Client ID: `lWFWbWJEMrJjJ6CXI4SWQGhYb1iYT7Wa`
+- Client ID: `rYUQIAvqPJ0Q9ZyMHmc6GYcDLyy8D1bk`
 - Audience: `https://dev-bpbgrel3zl2chj7s.us.auth0.com/api/v2/`
 
 No painel Auth0, confirme que a aplicação desse Client ID é do tipo **Single Page Application** e configure:
@@ -83,9 +83,9 @@ No painel Auth0, confirme que a aplicação desse Client ID é do tipo **Single 
 
 Se usar `127.0.0.1`, adicione também os endereços correspondentes. Para outro caminho ou porta, cadastre a URL exata; ajuste também `CORS_ALLOWED_ORIGINS` no backend. Em produção, use HTTPS.
 
-Sirva esta pasta com `python3 -m http.server 5500`, abra `http://localhost:5500/?demo=0#/` e clique em **Entrar**. Após o login, cada requisição aos três serviços inclui o access token; **Sair** encerra a sessão Auth0. Os tokens ficam no cache em memória do SDK. O navegador precisa acessar o CDN oficial Auth0 para carregar o SDK em modo API.
+Sirva esta pasta com `python3 -m http.server 5500`, abra `http://localhost:5500/?demo=0#/` e clique em **Entrar**. Após o login, cada requisição aos três serviços inclui o access token; **Sair** encerra a sessão Auth0. Os tokens ficam no cache persistente (`localStorage`) gerenciado pelo SDK, permitindo manter o login ao recarregar a página ou voltar à Home. O botão **Sair** limpa esse cache pelo SDK. Como esse armazenamento é acessível ao JavaScript da mesma origem, evite scripts não confiáveis e mantenha proteção contra XSS. O navegador precisa acessar o CDN oficial Auth0 para carregar o SDK em modo API.
 
-O modo `?demo=1` funciona sem carregar o SDK ou chamar Auth0. A preferência de modo é armazenada localmente; tokens não são gravados no localStorage.
+O modo `?demo=1` funciona sem carregar o SDK ou chamar Auth0. A preferência de modo também é armazenada localmente. Uma sessão expirada ainda depende da renovação pelo Auth0; caso ela não seja possível, será necessário entrar novamente.
 
 A audiência atual é da Management API, preservada do exemplo. Para usar uma API GameLibrary própria, configure o mesmo Identifier em `auth.js` e `AUTH0_AUDIENCE` nos três serviços. Nunca coloque client secrets no navegador.
 
@@ -96,3 +96,11 @@ node --test tests/auth.test.mjs
 ```
 
 O teste real do login depende das configurações acima no tenant Auth0.
+
+## Comunicação mínima com os serviços
+
+Ao abrir o frontend sem parâmetros, o modo API é o padrão. Uma preferência anterior por demonstração continua sendo respeitada; use `?demo=0` para forçar API ou `?demo=1` para demonstração.
+
+As URLs usam o mesmo protocolo e hostname do frontend, com portas 8080 (jogos), 8082 (músicas) e 8083 (enlistamentos). Para execução local, inicie os três serviços com `docker compose up --build` na pasta `backend`, sirva esta pasta na porta 5500 e abra `http://localhost:5500/?demo=0#/`. Configure o `.env` do backend conforme seu README.
+
+Entre com Auth0 antes de usar os serviços. Erros ao carregar coleções ou músicas são exibidos na tela, sem substituir respostas com falha por listas vazias. Para acessar por outro hostname, autorize também esse endereço no Auth0 e em `CORS_ALLOWED_ORIGINS`; se usar HTTPS, os serviços também precisam estar disponíveis por HTTPS.

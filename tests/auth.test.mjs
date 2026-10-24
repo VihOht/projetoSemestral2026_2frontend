@@ -26,13 +26,33 @@ async function setup(search = '', route = '#/trilhas') {
   return { module, calls, sdk };
 }
 
-test('SDK loads lazily and normal initialization checks session', async () => {
-  const { module, calls } = await setup();
+test('SDK loads lazily and restores a session when no cached user exists', async () => {
+  const { module, calls, sdk } = await setup();
+  let authenticated = false;
+  sdk.isAuthenticated = async () => authenticated;
+  sdk.checkSession = async () => { calls.push(['session']); authenticated = true; };
   assert.equal(calls.length, 0);
   assert.equal(await module.initializeAuth(), true);
   assert.equal(await module.accessToken(), 'access-token');
   assert.equal(calls.filter(c => c[0] === 'script').length, 1);
   assert.ok(calls.some(c => c[0] === 'session'));
+});
+
+test('reload and Home initialization retain a cached login without silent authentication', async () => {
+  for (const route of ['#/trilhas', '#/']) {
+    const { module, calls, sdk } = await setup('', route);
+    assert.equal(module.authConfig.cacheLocation, 'localstorage');
+    sdk.checkSession = async () => { throw new Error('Third-party cookies blocked'); };
+    assert.equal(await module.initializeAuth(), true);
+    assert.equal(await module.accessToken(), 'access-token');
+    assert.equal(calls.some(c => c[0] === 'login' || c[0] === 'logout'), false);
+  }
+});
+
+test('no cached login and no Auth0 session remains unauthenticated', async () => {
+  const { module, sdk } = await setup();
+  sdk.isAuthenticated = async () => false;
+  assert.equal(await module.initializeAuth(), false);
 });
 
 test('callback restores route and removes OAuth parameters', async () => {

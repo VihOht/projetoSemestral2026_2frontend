@@ -8,10 +8,18 @@ import { initializeAuth, login, logout, accessToken } from "./auth.js";
 
 // ---------- CONFIGURAÇÃO ----------
 
+// The three services run on the same host as the frontend.
+function serviceUrl(port, path) {
+  const url = new URL(window.location.origin);
+  url.port = port;
+  url.pathname = path;
+  return url.href;
+}
+
 const API = {
-  jogos: "http://localhost:8080/api/jogos",
-  musicas: "http://localhost:8082/api/musicas",
-  enl: "http://localhost:8083/api/enlistamentos"
+  jogos: serviceUrl("8080", "/api/jogos"),
+  musicas: serviceUrl("8082", "/api/musicas"),
+  enl: serviceUrl("8083", "/api/enlistamentos")
 };
 
 const PASTAS = [
@@ -24,7 +32,7 @@ const DEMO_KEY = "gamelibrary-demo-mode";
 const queryDemo = new URLSearchParams(location.search).get("demo");
 
 const DEMO = queryDemo === "1" ||
-  (queryDemo !== "0" && localStorage.getItem(DEMO_KEY) !== "off");
+  (queryDemo !== "0" && localStorage.getItem(DEMO_KEY) === "on");
 
 const $ = (selector, root = document) =>
   root.querySelector(selector);
@@ -335,7 +343,7 @@ async function http(url, options = {}) {
 
     try {
       const data = await response.json();
-      message = data.message || data.error || "";
+      message = data.detail || data.message || data.error || "";
     } catch {}
 
     throw new Error(message || `Erro HTTP ${response.status}`);
@@ -432,7 +440,7 @@ async function carregarCapas(root = document) {
 async function carregar() {
   const [jogos, enl] = await Promise.all([
     http(API.jogos),
-    http(API.enl).catch(() => [])
+    http(API.enl)
   ]);
 
   S.jogos = Array.isArray(jogos) ? jogos : [];
@@ -660,7 +668,7 @@ async function detalhes(id) {
 
   const musicas = await http(
     `${API.musicas}?jogoId=${id}`
-  ).catch(() => null);
+  );
 
   const chips = PASTAS.map(p => {
     const principal = jogo.pasta === p.id;
@@ -839,14 +847,7 @@ function formMusica(jogoId) {
 }
 
 async function trilhas() {
-  const musicas = await http(API.musicas).catch(() => null);
-
-  if (musicas === null) {
-    return vazio(
-      "Músicas indisponíveis",
-      "O serviço de músicas não está respondendo."
-    );
-  }
+  const musicas = await http(API.musicas);
 
   const ids = [...new Set(musicas.map(m => Number(m.jogoId)))];
 

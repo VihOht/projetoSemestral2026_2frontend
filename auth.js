@@ -1,7 +1,9 @@
 // Public SPA configuration. Never put an Auth0 client secret in browser code.
 export const authConfig = {
   domain: "dev-bpbgrel3zl2chj7s.us.auth0.com",
-  clientId: "lWFWbWJEMrJjJ6CXI4SWQGhYb1iYT7Wa",
+  clientId: "rYUQIAvqPJ0Q9ZyMHmc6GYcDLyy8D1bk",
+  // Keep the SDK-managed session across full page reloads.
+  cacheLocation: "localstorage",
   authorizationParams: {
     audience: "https://dev-bpbgrel3zl2chj7s.us.auth0.com/api/v2/",
     redirect_uri: window.location.origin + window.location.pathname
@@ -42,7 +44,7 @@ export async function initializeAuth() {
       history.replaceState({}, "", location.pathname + "?demo=0#/");
       throw error;
     }
-  } else {
+  } else if (!(await auth.isAuthenticated())) {
     await auth.checkSession();
   }
   return auth.isAuthenticated();
